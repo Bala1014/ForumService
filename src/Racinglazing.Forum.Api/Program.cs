@@ -23,6 +23,7 @@ builder.Services.AddForumAuthentication(builder.Configuration);
 
 builder.Services.AddExceptionHandler<DomainExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddHealthChecks();
 
 builder.Services.AddControllers(options =>
 {
@@ -73,8 +74,13 @@ if (app.Environment.IsDevelopment())
         }
 
 app.MapControllers();
-app.MapGet("/health", () => Results.Ok(new { status = "healthy" })).WithTags("System");
+// app.MapGet("/health", () => Results.Ok(new { status = "healthy" })).WithTags("System");
+app.MapHealthChecks("/health/live", new()
+{
+    Predicate = _ => false
+    });
 
+app.MapHealthChecks("/health/ready");
 await MigrateAndSeedAsync(app);
 
 app.Run();
