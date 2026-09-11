@@ -4,17 +4,33 @@ services:
     container_name: forumservice-postgres
     environment:
       POSTGRES_DB: forumservice
-      POSTGRES_USER: forum
-      POSTGRES_PASSWORD: forum
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
       - forum_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U forum -d forumservice"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d forumservice"]
       interval: 5s
       timeout: 5s
       retries: 5
-
+forumservice:
+  build:
+    context: .
+    dockerfile: Dockerfile
+  ports:
+    - "5001:8080"
+  depends_on:
+    postgres:
+      condition: service_healthy
+  environment:
+    ASPNETCORE_ENVIRONMENT: Development
+    ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=forumservice;Username=postgres;Password=postgres"
+    Database__SeedOnStartup: "true"
+    Jwt__Issuer: racingvacing-userservice
+    Jwt__Audience: racingvacing-forumservice
+    Jwt__SigningKey: development-only-signing-key-replace-me-with-32-bytes-minimum
+    Cors__AllowedOrigins__0: http://localhost:3000
 volumes:
   forum_pgdata:
