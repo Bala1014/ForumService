@@ -20,13 +20,11 @@ RUN dotnet publish src/Racinglazing.Forum.Api/Racinglazing.Forum.Api.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 
-# Runs as a non-root user. Cloud Run does not require it, but a container that cannot write to
-# its own filesystem is one less thing an exploited dependency can do.
-RUN adduser --disabled-password --gecos "" --uid 64198 forumservice \
-    && chown -R forumservice /app
-USER forumservice
-
-COPY --from=build --chown=forumservice /app/publish .
+# The base image ships a built-in non-root user exposed via $APP_UID (64198 by default).
+# Cloud Run does not require running as non-root, but it's one less thing an exploited
+# dependency can do.
+COPY --from=build --chown=$APP_UID:$APP_UID /app/publish .
+USER $APP_UID
 
 # Cloud Run supplies PORT; this default keeps local `docker run` working unchanged.
 ENV ASPNETCORE_URLS=http://+:8080 \
