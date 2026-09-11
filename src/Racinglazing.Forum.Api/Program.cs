@@ -65,13 +65,10 @@ if (authConfigured)
     app.UseAuthorization();
 }
 
-if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger(options => options.RouteTemplate = "openapi/{documentName}.json");
-            app.MapScalarApiReference(options => options
-                .WithTitle("RacingVacing RaceService")
-                .WithOpenApiRoutePattern("/openapi/{documentName}.json"));
-        }
+app.UseSwagger(options => options.RouteTemplate = "openapi/{documentName}.json");
+app.MapScalarApiReference(options => options
+    .WithTitle("RacingVacing ForumService")
+    .WithOpenApiRoutePattern("/openapi/{documentName}.json"));
 
 app.MapControllers();
 // app.MapGet("/health", () => Results.Ok(new { status = "healthy" })).WithTags("System");
