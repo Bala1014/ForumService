@@ -1,0 +1,76 @@
+### Racinglazing ForumService — smoke test requests
+### In development, ForumAuth:AllowDevHeaders = true, so identity comes from headers.
+
+@base = http://localhost:5080
+@userId = user-123
+@modId = mod-1
+
+### Health
+GET {{base}}/health
+
+### List categories
+GET {{base}}/api/v1/categories
+
+### List forums (grab a forumId from the response for the calls below)
+GET {{base}}/api/v1/forums
+
+# @name createThread
+### Create a thread (replace {forumId})
+POST {{base}}/api/v1/forums/{forumId}/threads
+Content-Type: application/json
+X-User-Id: {{userId}}
+
+{
+  "title": "Why is Ferrari struggling with tyre degradation?",
+  "content": { "text": "Why does Ferrari seem to struggle so much with tyre deg?" },
+  "tags": ["ferrari", "strategy"],
+  "raceId": null
+}
+
+### Get thread detail (replace {threadId})
+GET {{base}}/api/v1/threads/{threadId}
+X-User-Id: {{userId}}
+
+### List threads in a forum, hot
+GET {{base}}/api/v1/forums/{forumId}/threads?sort=hot&pageSize=20
+X-User-Id: {{userId}}
+
+### Create a top-level comment
+POST {{base}}/api/v1/threads/{threadId}/comments
+Content-Type: application/json
+X-User-Id: user-456
+
+{ "content": { "text": "I think it's tyre temperature management." } }
+
+### Vote a thread up
+PUT {{base}}/api/v1/threads/{threadId}/vote
+Content-Type: application/json
+X-User-Id: {{userId}}
+
+{ "vote": "up" }
+
+### List comments (top)
+GET {{base}}/api/v1/threads/{threadId}/comments?sort=top
+
+### Report a comment
+POST {{base}}/api/v1/reports
+Content-Type: application/json
+X-User-Id: user-789
+
+{ "targetType": "comment", "targetId": "{commentId}", "reason": "spam", "description": "ad" }
+
+### Moderator: list reports (needs a moderator role)
+GET {{base}}/api/v1/moderation/reports?status=pending
+X-User-Id: {{modId}}
+X-User-Roles: moderator
+
+### Pin a thread (moderator)
+PUT {{base}}/api/v1/threads/{threadId}/pin
+X-User-Id: {{modId}}
+X-User-Roles: moderator
+
+### Tags search
+GET {{base}}/api/v1/tags?search=ferr
+
+### Threads by tag
+GET {{base}}/api/v1/tags/ferrari/threads?sort=new
