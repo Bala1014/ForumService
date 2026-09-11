@@ -26,7 +26,7 @@ forumservice:
       condition: service_healthy
   environment:
     ASPNETCORE_ENVIRONMENT: Development
-    ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=forumservice;Username=postgres;Password=postgres"
+    ConnectionStrings__ForumDatabase: "Host=postgres;Port=5432;Database=forumservice;Username=postgres;Password=postgres"
     Database__SeedOnStartup: "true"
     Jwt__Issuer: racingvacing-userservice
     Jwt__Audience: racingvacing-forumservice
