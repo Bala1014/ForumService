@@ -68,7 +68,7 @@ jobs:
           URL=${{ steps.prod-url.outputs.url }}
 
           for i in {1..20}; do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL/health")
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL/health/ready")
 
             if [ "$STATUS" = "200" ]; then
               echo "Production deployment healthy"
