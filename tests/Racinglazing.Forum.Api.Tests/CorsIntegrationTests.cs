@@ -30,7 +30,7 @@ public sealed class CorsIntegrationTests : IClassFixture<ForumApiFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(AllowedOrigin, response.Headers.GetValues("Access-Control-Allow-Origin").Single());
         Assert.Contains(response.Headers.Vary,
-            value => string.Equals(value.Value, "Origin", StringComparison.OrdinalIgnoreCase));
+            value => string.Equals(value, "Origin", StringComparison.OrdinalIgnoreCase));
 
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         Assert.Equal(JsonValueKind.Array, document.RootElement.GetProperty("data").ValueKind);
