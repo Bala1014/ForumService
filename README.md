@@ -96,6 +96,19 @@ The API Gateway/UserService will issue JWTs later; the service is JWT-ready
 
 `AuthorId` is **always** taken from this identity, never from the request body.
 
+### CORS
+
+Browser origins are restricted with the `CORS_ALLOWED_ORIGINS` environment
+variable. Supply a comma-separated allow-list; no wildcard origin or credentials
+are enabled. For example:
+
+```bash
+CORS_ALLOWED_ORIGINS=https://raceservice-frontend-dev-dot-racingglazing.de.r.appspot.com,https://raceservice.example.com
+```
+
+The service allows API read/write methods (including `GET` and `OPTIONS`) with
+`Content-Type` and `Authorization` headers for listed origins.
+
 ## Migrations
 
 ```bash

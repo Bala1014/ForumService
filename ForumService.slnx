@@ -5,4 +5,7 @@
     <Project Path="src/Racinglazing.Forum.Domain/Racinglazing.Forum.Domain.csproj" />
     <Project Path="src/Racinglazing.Forum.Infrastructure/Racinglazing.Forum.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Racinglazing.Forum.Api.Tests/Racinglazing.Forum.Api.Tests.csproj" />
+  </Folder>
 </Solution>

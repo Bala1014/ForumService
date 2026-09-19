@@ -9,9 +9,30 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+const string CorsPolicyName = "TrustedFrontend";
+var corsAllowedOrigins = (builder.Configuration["CORS_ALLOWED_ORIGINS"] ?? string.Empty)
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    .Distinct(StringComparer.Ordinal)
+    .ToArray();
+
 // --- Composition root ---
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// CORS_ALLOWED_ORIGINS is intentionally an explicit allow-list. Add production
+// frontends as a comma-separated list rather than enabling a wildcard origin.
+builder.Services.AddCors(options => options.AddPolicy(CorsPolicyName, policy =>
+{
+    policy.WithOrigins(corsAllowedOrigins)
+        .WithMethods(
+            HttpMethods.Get,
+            HttpMethods.Post,
+            HttpMethods.Put,
+            HttpMethods.Patch,
+            HttpMethods.Delete,
+            HttpMethods.Options)
+        .WithHeaders("Content-Type", "Authorization");
+}));
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
@@ -51,6 +72,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Keep CORS outside exception handling so both successful responses and errors
+// receive the appropriate headers for an approved origin.
+app.UseCors(CorsPolicyName);
 app.UseExceptionHandler();
 
 // if (app.Environment.IsDevelopment())
