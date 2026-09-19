@@ -31,6 +31,6 @@ forumservice:
     Jwt__Issuer: racingvacing-userservice
     Jwt__Audience: racingvacing-forumservice
     Jwt__SigningKey: development-only-signing-key-replace-me-with-32-bytes-minimum
-    Cors__AllowedOrigins__0: http://localhost:3000
+    CORS_ALLOWED_ORIGINS: "http://localhost:3000"
 volumes:
   forum_pgdata:
