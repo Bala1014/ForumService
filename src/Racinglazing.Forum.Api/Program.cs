@@ -72,6 +72,27 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// With a single configured origin, the framework can omit Vary. Explicitly
+// vary CORS responses by Origin so shared caches cannot reuse an allow-list
+// response for a different browser origin.
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        if (context.Request.Headers.ContainsKey("Origin") &&
+            context.Response.Headers.ContainsKey("Access-Control-Allow-Origin"))
+        {
+            var vary = context.Response.Headers["Vary"].ToString();
+            if (!vary.Split(',').Any(value => string.Equals(value.Trim(), "Origin", StringComparison.OrdinalIgnoreCase)))
+                context.Response.Headers["Vary"] = string.IsNullOrWhiteSpace(vary) ? "Origin" : $"{vary}, Origin";
+        }
+
+        return Task.CompletedTask;
+    });
+
+    await next();
+});
+
 // Keep CORS outside exception handling so both successful responses and errors
 // receive the appropriate headers for an approved origin.
 app.UseCors(CorsPolicyName);
