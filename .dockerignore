@@ -1,0 +1,7 @@
+# Do not overwrite the container's restored NuGet assets with host or CI build
+# outputs before the Dockerfile's `dotnet publish --no-restore` step.
+**/bin/
+**/obj/
+
+# These are not needed to build the application image.
+.git/
