@@ -15,6 +15,8 @@ public sealed class CorsIntegrationTests : IClassFixture<ForumApiFactory>
 {
     private const string AllowedOrigin =
         "https://raceservice-frontend-dev-dot-racingglazing.de.r.appspot.com";
+    private const string ProductionOrigin =
+        "https://raceservice-frontend-dot-racingglazing.de.r.appspot.com";
     private readonly HttpClient _client;
 
     public CorsIntegrationTests(ForumApiFactory factory) => _client = factory.CreateClient();
@@ -69,6 +71,18 @@ public sealed class CorsIntegrationTests : IClassFixture<ForumApiFactory>
     }
 
     [Fact]
+    public async Task Forums_list_from_second_allowed_origin_returns_matching_cors_header()
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/forums");
+        request.Headers.Add("Origin", ProductionOrigin);
+
+        using var response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(ProductionOrigin, response.Headers.GetValues("Access-Control-Allow-Origin").Single());
+    }
+
+    [Fact]
     public async Task Error_response_from_allowed_origin_returns_cors_header()
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/forums/not-a-guid");
@@ -87,7 +101,8 @@ public sealed class ForumApiFactory : WebApplicationFactory<Program>
     {
         builder.UseSetting("ForumDatabase:AutoMigrate", "false");
         builder.UseSetting("CORS_ALLOWED_ORIGINS",
-            "https://raceservice-frontend-dev-dot-racingglazing.de.r.appspot.com");
+            "https://raceservice-frontend-dev-dot-racingglazing.de.r.appspot.com," +
+            "https://raceservice-frontend-dot-racingglazing.de.r.appspot.com");
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<IForumService>();
