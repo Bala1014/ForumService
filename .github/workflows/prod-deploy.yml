@@ -52,8 +52,9 @@ jobs:
             --region $REGION \
             --platform managed \
             --allow-unauthenticated \
-            --add-cloudsql-instances racingglazing:asia-south1:raceservice-postgres \
-            --set-env-vars ConnectionStrings__ForumDatabase="Host=/cloudsql/racingglazing:asia-south1:raceservice-postgres;Database=forumservice;Username=forumserviceuser;Password=${{ secrets.POSTGRES_PASSWORD }}"
+            --service-account raceservice-runtime@$PROJECT_ID.iam.gserviceaccount.com \
+            --add-cloudsql-instances $PROJECT_ID:asia-south1:raceservice-postgres \
+            --set-env-vars ConnectionStrings__ForumDatabase="Host=/cloudsql/$PROJECT_ID:asia-south1:raceservice-postgres;Database=forumservice;Username=forumserviceuser;Password=${{ secrets.POSTGRES_PASSWORD }}"
 
       - name: Get Production URL
         id: prod-url
