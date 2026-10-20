@@ -6,9 +6,10 @@ on:
       - main
 
 env:
-  PROJECT_ID: racingglazing
+  PROJECT_ID: racingglazing-510419
   REGION: asia-south1
   SERVICE: forumservice
+  AR_REPO: raceservice   # artrifact repository name
 
 jobs:
   validate:
@@ -32,7 +33,7 @@ jobs:
 
       - name: Configure Docker
         run: |
-          gcloud auth configure-docker asia-south1-docker.pkg.dev
+          gcloud auth configure-docker $REGION-docker.pkg.dev
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -51,4 +52,4 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-            -t asia-south1-docker.pkg.dev/$PROJECT_ID/app-images/$SERVICE:${GITHUB_SHA} .
+            -t $REGION-docker.pkg.dev/$PROJECT_ID/$AR_REPO/$SERVICE:${GITHUB_SHA} .
