@@ -136,6 +136,7 @@ static async Task MigrateAndSeedAsync(WebApplication app)
     var db = scope.ServiceProvider.GetRequiredService<ForumDbContext>();
     await db.Database.MigrateAsync();
     await ForumDbSeeder.SeedAsync(db);
+    await ForumDbDummyDataSeeder.SeedAsync(db);
 }
 
 // Exposed for integration testing.
