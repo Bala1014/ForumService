@@ -37,8 +37,18 @@ public static class DependencyInjection
         services.AddSingleton<ISlugGenerator, SlugGenerator>();
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
 
-        // External-service integrations (stubbed until the services exist).
-        services.AddScoped<IUserProfileProvider, StubUserProfileProvider>();
+        // UserService owns public author details. Retain the stub only where a
+        // local UserService URL was intentionally not configured.
+        var userServiceBaseUrl = configuration["UserService:BaseUrl"];
+        if (Uri.TryCreate(userServiceBaseUrl, UriKind.Absolute, out var userServiceUri))
+        {
+            services.AddSingleton(new HttpClient { BaseAddress = new Uri($"{userServiceUri.AbsoluteUri.TrimEnd('/')}/") });
+            services.AddScoped<IUserProfileProvider, UserServiceProfileProvider>();
+        }
+        else
+        {
+            services.AddScoped<IUserProfileProvider, StubUserProfileProvider>();
+        }
         services.AddScoped<IRaceServiceClient, StubRaceServiceClient>();
 
         return services;
