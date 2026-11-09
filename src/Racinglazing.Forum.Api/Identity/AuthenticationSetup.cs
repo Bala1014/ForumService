@@ -23,6 +23,9 @@ public static class AuthenticationSetup
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
+                // Keep the UserService's standard claim names (`sub`, `role`)
+                // available to CurrentUser instead of applying legacy mappings.
+                options.MapInboundClaims = false;
                 if (!string.IsNullOrWhiteSpace(authority)) options.Authority = authority;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
